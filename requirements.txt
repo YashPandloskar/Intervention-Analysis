@@ -1,0 +1,10 @@
+numpy>=1.26
+pandas>=2.1
+scikit-learn>=1.4
+statsmodels>=0.14
+prophet>=1.1.5
+ruptures>=1.1.9
+tensorflow>=2.16
+yfinance>=0.2.40
+matplotlib>=3.8
+pyyaml>=6.0

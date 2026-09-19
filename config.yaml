@@ -1,0 +1,49 @@
+# Configuration for the intervention-analysis pipeline.
+# Run with:  python -m intervention_analysis --config config.yaml
+
+tickers: [TSLA, IBM]
+
+data:
+  years: 2            # length of the price window ending at `end` (the paper uses ~2 years)
+  end: null           # null = today. Set e.g. "2026-09-18" to freeze the window.
+  target: Close       # column to forecast
+  cache_dir: data     # downloaded prices are cached here as <TICKER>.csv
+
+split:
+  train_frac: 0.8     # chronological 80 / 20 train-test split
+
+intervention:
+  kind: step          # step = permanent level shift from the date on, pulse = one-day shock
+  # Sliding-window kernel change-point detection (paper, Section III-D).
+  width: 60           # window width in trading days
+  pen: 2.0            # penalty term P_k; larger => fewer interventions
+  n_bkps: null        # set an integer to force an exact number of interventions (overrides pen)
+  bandwidth: null     # RBF bandwidth gamma of Eq. 15 on the z-scored series; null = median heuristic
+  min_size: 10        # minimum segment length
+
+arima:
+  d: 1
+  max_p: 3            # (p, q) picked by AIC on the training data, then shared by ARIMA and SARIMA
+  max_q: 3
+
+sarima:
+  seasonal_order: [1, 0, 1, 5]   # (P, D, Q, s); s = 5 trading days per week
+
+prophet:
+  country_holidays: US           # h_t term; use null to disable
+  yearly_seasonality: auto
+
+deep:
+  lookback: 20
+  epochs: 300
+  batch_size: 32
+  patience: null       # null = train for all epochs; an integer enables early stopping on a chronological hold-out
+  val_frac: 0.1        # size of that hold-out (only used when patience is set)
+  learning_rate: 0.001
+  rnn_units: 50
+  lstm_units: 50
+  mlp_hidden: [64, 32]
+  mlp_activation: sigmoid
+  seeds: [0, 1, 2]     # each network is trained once per seed; metrics are averaged
+
+output: results
