@@ -37,8 +37,8 @@ def fit_sarimax(
 ) -> list[Forecast]:
     """ARIMA / SARIMA with the intervention variables entering as exogenous regressors.
 
-    Without ``problem.d_train`` this is Eq. 1 (and the plain SARIMA equation); with it,
-    the regression term delta * D_t of Eq. 2 (and gamma * D_t for SARIMA) is added.
+    Without ``problem.d_train`` this is the plain ARIMA / SARIMA model; with it, the
+    regression term delta * D_t is added.
     """
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
@@ -58,7 +58,7 @@ def fit_sarimax(
 def fit_prophet(
     problem: Problem, country_holidays: str | None = "US", yearly_seasonality: bool | str = "auto"
 ) -> list[Forecast]:
-    """Prophet: y = g + s + h + delta * I_t + e (Eq. 9 / 10).
+    """Prophet: y = g + s + h + delta * D_t + e.
 
     Prophet is not autoregressive, so its one-step and multi-step forecasts coincide.
     """

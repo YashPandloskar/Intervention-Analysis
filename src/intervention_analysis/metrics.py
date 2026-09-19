@@ -1,4 +1,4 @@
-"""Evaluation metrics used in the paper: MSE, RMSE and MAE."""
+"""Evaluation metrics: MSE, RMSE and MAE."""
 from __future__ import annotations
 
 import numpy as np

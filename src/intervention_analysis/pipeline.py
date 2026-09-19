@@ -23,7 +23,7 @@ from .models.statistical import fit_prophet, fit_sarimax, select_order
 
 log = logging.getLogger(__name__)
 
-# Model name -> family, in the order used by the paper's tables.
+# Model name -> family.
 MODELS = {
     "PROPHET": "Time Series Analysis",
     "ARIMA": "Time Series Analysis",
@@ -34,10 +34,11 @@ MODELS = {
 }
 VARIANTS = {"baseline": "Without intervention", "intervention": "With intervention"}
 
-# "paper": time-series models forecast the whole test window from the end of training,
-#          deep models predict one step ahead from a window of true past prices.
+# "native":   each model in its natural forecasting mode. ARIMA / SARIMA forecast the whole test
+#             window from the end of training; the deep networks, which take a window of past
+#             prices as input, predict one step ahead from the true past.
 # "one_step": every model predicts one step ahead from the true past (like-for-like).
-PROTOCOLS = ("paper", "one_step")
+PROTOCOLS = ("native", "one_step")
 
 
 def run_ticker(ticker: str, cfg: dict, out_dir: Path, refresh: bool = False) -> pd.DataFrame:
@@ -115,31 +116,31 @@ def run_ticker(ticker: str, cfg: dict, out_dir: Path, refresh: bool = False) -> 
     # Predictions of the first run, for inspection and plotting.
     predictions = pd.DataFrame({"date": base.dates_test, "actual": base.y_test})
     for (model, variant), fcs in forecasts.items():
-        predictions[f"{model}_{variant}"] = _select(fcs[0], "paper")
+        predictions[f"{model}_{variant}"] = _select(fcs[0], "native")
     predictions.to_csv(out_dir / "predictions.csv", index=False)
 
     for variant in problems:
         plots.plot_forecasts(
             base.dates_test, base.y_test,
-            {m: _select(forecasts[(m, variant)][0], "paper") for m in MODELS},
+            {m: _select(forecasts[(m, variant)][0], "native") for m in MODELS},
             f"{ticker} - {VARIANTS[variant].lower()}", out_dir / f"forecast_{variant}.png",
         )
     return metrics
 
 
 def _select(forecast: Forecast, protocol: str) -> np.ndarray:
-    if protocol == "paper" and forecast.multi_step is not None:
+    if protocol == "native" and forecast.multi_step is not None:
         return forecast.multi_step
     return forecast.one_step
 
 
 def write_summary(metrics: pd.DataFrame, path: Path) -> None:
-    """Write paper-style tables (MSE / RMSE / MAE per model) as Markdown."""
+    """Write the MSE / RMSE / MAE tables per ticker and model as Markdown."""
     lines = ["# Results", ""]
     for protocol in PROTOCOLS:
         title = {
-            "paper": "Paper protocol (time-series models: multi-step forecast of the test window; "
-                     "deep models: one-step-ahead)",
+            "native": "Native forecasting mode (ARIMA / SARIMA / Prophet: forecast the whole test window; "
+                      "deep models: one-step-ahead)",
             "one_step": "Like-for-like protocol (every model: one-step-ahead)",
         }[protocol]
         lines += [f"## {title}", ""]

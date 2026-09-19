@@ -3,10 +3,10 @@
 How the intervention variable D_t enters each network:
 
 * RNN / LSTM - D_t is concatenated to the input at every time step. Because the
-  cell computes ``W . [x_t, D_t] = W_x . x_t + W_d . D_t``, this is exactly the extra
-  ``delta * I_t`` (RNN, Eq. 13) and ``W . D_t`` (LSTM gates, Eq. 6-8) term of the paper.
+  cell computes ``W . [x_t, D_t] = W_x . x_t + W_d . D_t``, this is exactly an extra
+  ``delta * D_t`` term in the RNN hidden state and ``W . D_t`` term in the LSTM gates.
 * MLP - D_t is added to the pre-activation of the second layer,
-  ``z2 = sigma(W2 . z1 + delta . D_t + b2)``, as in the paper.
+  ``z2 = sigma(W2 . z1 + delta . D_t + b2)``.
 
 Alignment: a window of ``lookback`` past prices predicts the price at time t, and
 the intervention variables handed to the network are those of the *predicted* days

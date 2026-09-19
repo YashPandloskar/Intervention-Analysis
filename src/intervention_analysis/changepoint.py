@@ -1,8 +1,8 @@
 """Intervention-point detection and construction of the intervention variable D_t.
 
-Detection follows Section III-D of the paper: a sliding-window search over a
-kernel cost. The fit term is the RBF-kernel cost (Eq. 15), a penalty term is
-added (C_k = F_k + P_k) and the segmentation with the lowest cost is kept.
+Detection is a sliding-window search over a kernel cost. The fit term is the
+RBF-kernel cost F_k = exp(-||x_i - x_j||^2 / (2 gamma^2)), a penalty term is added
+(C_k = F_k + P_k) and the segmentation with the lowest cost is kept.
 """
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ def detect_change_points(
     width:     sliding-window width (trading days).
     pen:       penalty P_k added to the fit term; larger => fewer change points.
     n_bkps:    if given, ignore ``pen`` and return exactly this many points.
-    bandwidth: RBF bandwidth gamma of Eq. 15 on the z-scored series.
+    bandwidth: RBF kernel bandwidth gamma on the z-scored series.
                ``None`` uses the median heuristic.
     """
     values = prices.to_numpy(dtype=float)

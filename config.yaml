@@ -4,7 +4,7 @@
 tickers: [TSLA, IBM]
 
 data:
-  years: 2            # length of the price window ending at `end` (the paper uses ~2 years)
+  years: 2            # length of the price window ending at `end`
   end: null           # null = today. Set e.g. "2026-09-18" to freeze the window.
   target: Close       # column to forecast
   cache_dir: data     # downloaded prices are cached here as <TICKER>.csv
@@ -14,11 +14,11 @@ split:
 
 intervention:
   kind: step          # step = permanent level shift from the date on, pulse = one-day shock
-  # Sliding-window kernel change-point detection (paper, Section III-D).
+  # Sliding-window kernel change-point detection.
   width: 60           # window width in trading days
   pen: 2.0            # penalty term P_k; larger => fewer interventions
   n_bkps: null        # set an integer to force an exact number of interventions (overrides pen)
-  bandwidth: null     # RBF bandwidth gamma of Eq. 15 on the z-scored series; null = median heuristic
+  bandwidth: null     # RBF kernel bandwidth on the z-scored series; null = median heuristic
   min_size: 10        # minimum segment length
 
 arima:

@@ -1,6 +1,6 @@
 # Results
 
-## Paper protocol (time-series models: multi-step forecast of the test window; deep models: one-step-ahead)
+## Native forecasting mode (ARIMA / SARIMA / Prophet: forecast the whole test window; deep models: one-step-ahead)
 
 ### TSLA - Without intervention
 
